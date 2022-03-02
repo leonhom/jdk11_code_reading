@@ -95,6 +95,11 @@ import jdk.internal.misc.SharedSecrets;
  * <p>This class is a member of the
  * <a href="{@docRoot}/java.base/java/util/package-summary.html#CollectionsFramework">
  * Java Collections Framework</a>.
+ * <p>
+ * 基于数组结构的集合，继承了AbstractList，实现了List、RandomAccess、Cloneable、Serializable接口
+ * 1. RandomAccess：支持快速随机访问
+ * 2. Cloneable：支持浅克隆
+ * 3. Serializable：支持序列化
  *
  * @param <E> the type of elements in this list
  * @author Josh Bloch
@@ -124,6 +129,7 @@ public class ArrayList<E> extends AbstractList<E>
      * Shared empty array instance used for default sized empty instances. We
      * distinguish this from EMPTY_ELEMENTDATA to know how much to inflate when
      * first element is added.
+     * 默认空数组
      */
     private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
 
@@ -132,11 +138,15 @@ public class ArrayList<E> extends AbstractList<E>
      * The capacity of the ArrayList is the length of this array buffer. Any
      * empty ArrayList with elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
      * will be expanded to DEFAULT_CAPACITY when the first element is added.
+     * <p>
+     * 用于存放ArrayList元素数据的数组，使用transient修饰，使得该内容不会被序列化
+     * 在第一次添加元素时初始化容量
      */
     transient Object[] elementData; // non-private to simplify nested class access
 
     /**
      * The size of the ArrayList (the number of elements it contains).
+     * ArrayList长度，即实际存放元素的数量
      *
      * @serial
      */
@@ -144,6 +154,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * Constructs an empty list with the specified initial capacity.
+     * 指定容量初试容量的构造方法
      *
      * @param initialCapacity the initial capacity of the list
      * @throws IllegalArgumentException if the specified initial capacity
@@ -208,14 +219,19 @@ public class ArrayList<E> extends AbstractList<E>
      * Increases the capacity of this {@code ArrayList} instance, if
      * necessary, to ensure that it can hold at least the number of elements
      * specified by the minimum capacity argument.
+     * <p>
+     * 添加元素是，确保当前容量足够
      *
      * @param minCapacity the desired minimum capacity
      */
     public void ensureCapacity(int minCapacity) {
-        if (minCapacity > elementData.length
-                && !(elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
-                && minCapacity <= DEFAULT_CAPACITY)) {
+        if (minCapacity > elementData.length &&
+                !(elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA && minCapacity <= DEFAULT_CAPACITY)) {
+
+            // 记录修改次数
             modCount++;
+
+            // 扩容
             grow(minCapacity);
         }
     }
@@ -231,13 +247,14 @@ public class ArrayList<E> extends AbstractList<E>
     /**
      * Increases the capacity to ensure that it can hold at least the
      * number of elements specified by the minimum capacity argument.
+     * <p>
+     * 扩容方法
      *
      * @param minCapacity the desired minimum capacity
      * @throws OutOfMemoryError if minCapacity is less than zero
      */
     private Object[] grow(int minCapacity) {
-        return elementData = Arrays.copyOf(elementData,
-                newCapacity(minCapacity));
+        return elementData = Arrays.copyOf(elementData, newCapacity(minCapacity));
     }
 
     private Object[] grow() {
