@@ -266,21 +266,34 @@ public class ArrayList<E> extends AbstractList<E>
      * Returns the current capacity increased by 50% if that suffices.
      * Will not return a capacity greater than MAX_ARRAY_SIZE unless
      * the given minimum capacity is greater than MAX_ARRAY_SIZE.
+     * 返回至少与给定最小容量一样大的容量。
+     * 如果足够，则返回当前容量增加 50%。除非给定的最小容量大于 MAX_ARRAY_SIZE，否则不会返回大于 MAX_ARRAY_SIZE 的容量。
      *
      * @param minCapacity the desired minimum capacity
      * @throws OutOfMemoryError if minCapacity is less than zero
      */
     private int newCapacity(int minCapacity) {
         // overflow-conscious code
+
+        // 获取旧数组容量
         int oldCapacity = elementData.length;
+
+        // 获取新数组容量 = 旧数组容量 + 旧数组容量 / 2；即扩容后的容量为旧容量的1.5倍；>> 1位运算等于 ÷2
         int newCapacity = oldCapacity + (oldCapacity >> 1);
+
+        // 扩容后的容量小于当前元素的数量
         if (newCapacity - minCapacity <= 0) {
+            // 当前未初始化状态，返回初始值与指定容量中的最大值
             if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA)
                 return Math.max(DEFAULT_CAPACITY, minCapacity);
+            // 指定容量小于0，抛出异常
             if (minCapacity < 0) // overflow
                 throw new OutOfMemoryError();
+            // 返回指定大小的容量值
             return minCapacity;
         }
+
+        // 扩容后的容量大于指定期望的容量值，判断是否超过数组可分配的最大值。超过则返回Int的最大值
         return (newCapacity - MAX_ARRAY_SIZE <= 0)
                 ? newCapacity
                 : hugeCapacity(minCapacity);
@@ -333,11 +346,21 @@ public class ArrayList<E> extends AbstractList<E>
      * or -1 if there is no such index.
      */
     public int indexOf(Object o) {
+        // 从0~size的范围内查找元素o
         return indexOfRange(o, 0, size);
     }
 
+    /**
+     * 从start开始，到end的范围内查找o
+     *
+     * @param o
+     * @param start
+     * @param end
+     * @return
+     */
     int indexOfRange(Object o, int start, int end) {
         Object[] es = elementData;
+        // 正序遍历，NULL情况单独处理，返回第一个匹配的索引值
         if (o == null) {
             for (int i = start; i < end; i++) {
                 if (es[i] == null) {
@@ -483,6 +506,7 @@ public class ArrayList<E> extends AbstractList<E>
     /**
      * Replaces the element at the specified position in this list with
      * the specified element.
+     * 替换指定索引位置的值
      *
      * @param index   index of the element to replace
      * @param element element to be stored at the specified position
@@ -490,9 +514,13 @@ public class ArrayList<E> extends AbstractList<E>
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     public E set(int index, E element) {
+        // 校验索引值是否合法
         Objects.checkIndex(index, size);
+        // 获取旧元素
         E oldValue = elementData(index);
+        // 替换旧元素
         elementData[index] = element;
+        // 返回旧元素
         return oldValue;
     }
 
@@ -528,20 +556,29 @@ public class ArrayList<E> extends AbstractList<E>
      * list. Shifts the element currently at that position (if any) and
      * any subsequent elements to the right (adds one to their indices).
      *
+     * 将元素添加到指定索引位置
+     *
      * @param index   index at which the specified element is to be inserted
      * @param element element to be inserted
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     public void add(int index, E element) {
+
+        // 判断传入的索引值是否在正常范围内
         rangeCheckForAdd(index);
+
+        // 操作记录数+1
         modCount++;
         final int s;
         Object[] elementData;
+        // 判断当前数组是否需要扩容
         if ((s = size) == (elementData = this.elementData).length)
+            // 执行扩容
             elementData = grow();
-        System.arraycopy(elementData, index,
-                elementData, index + 1,
-                s - index);
+
+        // 复制数组
+        System.arraycopy(elementData, index, elementData, index + 1, s - index);
+        // 存入元素
         elementData[index] = element;
         size = s + 1;
     }
@@ -806,6 +843,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * A version of rangeCheck used by add and addAll.
+     * 判断传入的索引值是否在正常范围内
      */
     private void rangeCheckForAdd(int index) {
         if (index > size || index < 0)
